@@ -1,0 +1,70 @@
+
+
+#rgb24..  structure
+
+
+#set text file name for output
+tfilename = "rgb_hex.txt"
+
+
+
+from PIL import Image
+import glob, os
+
+im = Image.open("4paul.jpg")
+
+img = im.resize((32,32), Image.ANTIALIAS)
+
+pix = img.load()
+
+
+
+w, h = img.size[0], img.size[1]     #dimensions = image dimensions
+d = 3                               #depth is 3, rgb
+
+#initialize 3d matrix to hold rgb data extracted from image
+rgbarray = [[[0 for x in range(w)] for y in range(h)] for z in range (d)]
+
+#fill rgb matrix
+for x in range(0, img.size[0]):
+    for y in range(0, img.size[1]):
+        for z in range(0, d):
+            rgbarray[z][y][x] = hex(pix[x, y][z])
+
+#append and write to text file
+tfile = open(tfilename,"w")
+
+
+tfile.write("#ifndef IMG_NAME \n#define IMG_NAME\n#include <stdint.h> \nconst uint8_t img_name[32][32][3] = {")
+
+
+
+
+
+for y in range(h):
+
+    tfile.write("\n")
+    tfile.write("{")
+
+    for x in range(w):
+
+        tfile.write("{")
+        for z in range(d):
+
+            tfile.write(rgbarray[z][y][x])
+            if z != (d-1):
+                tfile.write(", ")
+
+        tfile.write("}")
+
+        if x != (w-1):
+            tfile.write(", ")
+    tfile.write("}")
+
+    if y != (h-1):
+        tfile.write(", ")
+
+tfile.write("}; \n #endif")
+
+
+tfile.close()
